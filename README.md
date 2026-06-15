@@ -22,6 +22,10 @@ This project packages Antigravity Hub (2.1.4) and Antigravity IDE (2.0.4) into a
 git clone https://github.com/dbachran/antigravity-sandbox.git
 cd antigravity-sandbox
 
+# Create your local config (edit paths to match your system)
+cp .env.example .env
+# → Open .env and set WORKSPACE_DIR and HOST_FONTS_DIR
+
 # Build and start the container
 docker compose up -d --build
 
@@ -33,6 +37,8 @@ docker exec -it antigravity-sandbox bash
 
 ```
 .
+├── .env.example     # Template — copy to .env and edit
+├── .env             # Local config (git-ignored) with your paths
 ├── Dockerfile       # Container image: Ubuntu 24.04 + Chrome + Antigravity Hub & IDE
 ├── compose.yaml     # Compose service definition with display & volume mounts
 └── README.md
@@ -60,16 +66,29 @@ The `compose.yaml` configures:
 
 ## Configuration
 
-Key environment variables are inherited from the host via `compose.yaml`:
+All user-specific paths are configured through a **`.env`** file (see [`.env.example`](.env.example)).
+
+### `.env` Variables
+
+| Variable | Description | Example |
+|---|---|---|
+| `WORKSPACE_DIR` | Antigravity workspace directory on the host. Mounted into the container and used as `HOME` and `working_dir`. | `/home/youruser/dev/antigravity` |
+| `HOST_FONTS_DIR` | Path to your local fonts directory (mounted read-only). | `/home/youruser/.local/share/fonts` |
+
+```bash
+# Copy the template and edit it
+cp .env.example .env
+```
+
+### Runtime Variables (inherited from host)
+
+These are picked up automatically from your shell environment — no need to set them in `.env`:
 
 | Variable | Purpose |
 |---|---|
 | `DISPLAY` | X11 display identifier |
 | `WAYLAND_DISPLAY` | Wayland display socket name |
 | `XDG_RUNTIME_DIR` | Runtime directory for Wayland/D-Bus sockets |
-| `HOME` | Set to `/home/g0ph3r/dev/antigravity` inside the container |
-
-> **Tip:** If you need to customise paths, edit the `volumes` and `environment` sections in `compose.yaml`.
 
 ## Troubleshooting
 

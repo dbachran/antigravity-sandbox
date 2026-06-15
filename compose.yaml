@@ -11,14 +11,14 @@ services:
       DISPLAY: ${DISPLAY}
       WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}
       XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}
-      HOME: /home/g0ph3r/dev/antigravity
+      HOME: ${WORKSPACE_DIR}
       DBUS_SESSION_BUS_ADDRESS: unix:path=${XDG_RUNTIME_DIR}/bus
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:ro
       - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
-      - /home/g0ph3r/dev/antigravity:/home/g0ph3r/dev/antigravity:Z
+      - ${WORKSPACE_DIR}:${WORKSPACE_DIR}:Z
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
       - /usr/share/fonts:/usr/local/share/fonts/host:ro
-      - /home/g0ph3r/.local/share/fonts:/home/g0ph3r/dev/antigravity/.local/share/fonts:ro
-    working_dir: /home/g0ph3r/dev/antigravity
+      - ${HOST_FONTS_DIR}:${WORKSPACE_DIR}/.local/share/fonts:ro
+    working_dir: ${WORKSPACE_DIR}
     command: sleep infinity
