@@ -1,0 +1,24 @@
+services:
+  antigravity:
+    build: .
+    container_name: antigravity-sandbox
+    network_mode: "host"
+    userns_mode: "keep-id"
+    shm_size: "2gb"
+    devices:
+      - "/dev/dri:/dev/dri"
+    environment:
+      DISPLAY: ${DISPLAY}
+      WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}
+      XDG_RUNTIME_DIR: ${XDG_RUNTIME_DIR}
+      HOME: /home/g0ph3r/dev/antigravity
+      DBUS_SESSION_BUS_ADDRESS: unix:path=${XDG_RUNTIME_DIR}/bus
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+      - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
+      - /home/g0ph3r/dev/antigravity:/home/g0ph3r/dev/antigravity:Z
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+      - /usr/share/fonts:/usr/local/share/fonts/host:ro
+      - /home/g0ph3r/.local/share/fonts:/home/g0ph3r/dev/antigravity/.local/share/fonts:ro
+    working_dir: /home/g0ph3r/dev/antigravity
+    command: sleep infinity
