@@ -26,17 +26,23 @@ RUN mkdir -p /opt/antigravity-x86 /opt/antigravity-ide
 
 # Antigravity 2.0 herunterladen und entpacken
 # Hinweis: Passe den tar-Befehl an, falls die Datei ein anderes Format hat (z.B. .deb oder .zip)
-RUN curl -L -o /tmp/ag2.tar.gz https://storage.googleapis.com/antigravity-public/antigravity-hub/2.1.4-6481382726303744/linux-x64/Antigravity.tar.gz \
+RUN curl -L -o /tmp/ag2.tar.gz https://storage.googleapis.com/antigravity-public/antigravity-hub/2.2.1-5287492581195776/linux-x64/Antigravity.tar.gz \
     && tar -xzf /tmp/ag2.tar.gz -C /opt/antigravity-x86 --strip-components=1 \
     && rm /tmp/ag2.tar.gz
 
 # Antigravity IDE herunterladen und entpacken
-RUN curl -L -o /tmp/ag-ide.tar.gz https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.0.4-6381998290370560/linux-x64/Antigravity%20IDE.tar.gz \
+RUN curl -L -o /tmp/ag-ide.tar.gz https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.1.1-6123990880747520/linux-x64/Antigravity%20IDE.tar.gz \
     && tar -xzf /tmp/ag-ide.tar.gz -C /opt/antigravity-ide --strip-components=1 \
     && rm /tmp/ag-ide.tar.gz
 
 # xdg-open Wrapper für Wayland/Chrome erstellen, um OAuth-Logins abzufangen
-RUN echo '#!/bin/bash\necho "$1" >> /tmp/auth-url.log\ngoogle-chrome --enable-features=UseOzonePlatform --ozone-platform=wayland "$1" &' > /usr/local/bin/xdg-open \
+RUN printf '#!/bin/bash\n\
+echo "$1" >> /tmp/auth-url.log\n\
+if [ -n "$WAYLAND_DISPLAY" ]; then\n\
+    google-chrome --enable-features=UseOzonePlatform --ozone-platform=wayland "$1" &\n\
+else\n\
+    google-chrome "$1" &\n\
+fi\n' > /usr/local/bin/xdg-open \
     && chmod +x /usr/local/bin/xdg-open
 
 # Standard-Kommando

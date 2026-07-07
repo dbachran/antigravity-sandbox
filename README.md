@@ -1,16 +1,16 @@
 # Antigravity Sandbox
 
-A Docker-based sandbox environment for running **Antigravity Hub** and **Antigravity IDE** inside a container with full GUI support (Wayland / X11).
+A Podman-based sandbox environment (with Docker fallback) for running **Antigravity Hub** and **Antigravity IDE** inside a container with full GUI support (Wayland / X11).
 
 ## Overview
 
-This project packages Antigravity Hub (2.1.4) and Antigravity IDE (2.0.4) into an Ubuntu 24.04 container, forwarding the host's display server so that both applications can render their UIs natively. It also bundles Google Chrome for handling OAuth login flows via a custom `xdg-open` wrapper.
+This project packages Antigravity Hub and Antigravity IDE into an Ubuntu 24.04 container, forwarding the host's display server so that both applications can render their UIs natively. It also bundles Google Chrome for handling OAuth login flows via a custom `xdg-open` wrapper.
 
 ## Prerequisites
 
 | Requirement | Details |
 |---|---|
-| **Docker / Podman** | With Compose v2 (`docker compose`) |
+| **Podman / Docker** | Podman with Podman Compose (preferred), or Docker with Compose v2 |
 | **Display server** | Wayland (preferred) or X11 |
 | **GPU access** | `/dev/dri` must be available on the host |
 | **Host OS** | Linux (tested on Wayland-based desktops) |
@@ -27,10 +27,27 @@ cp .env.example .env
 # → Open .env and set WORKSPACE_DIR and HOST_FONTS_DIR
 
 # Build and start the container
-docker compose up -d --build
+podman compose up -d --build
 
 # Open a shell inside the sandbox
-docker exec -it antigravity-sandbox bash
+podman exec -it antigravity-sandbox bash
+```
+
+## How to Update
+
+Check and copy download links from [Google Antigravity Download page for Linux](https://antigravity.google/download).
+
+Update download links in [Dockerfile](Dockerfile)
+
+Stop and rebuild the container, forcing all tools to get updated.
+
+```bash
+# Stop the container if running
+podman compose down
+
+# Renew container, thus updating all tools
+podman compose build --no-cache
+podman compose up -d --force-recreate
 ```
 
 ## Project Structure
@@ -54,7 +71,7 @@ docker exec -it antigravity-sandbox bash
 4. **Antigravity IDE** — Downloaded and extracted to `/opt/antigravity-ide`.
 5. **`xdg-open` wrapper** — A small script that intercepts URL-open calls, logs the URL to `/tmp/auth-url.log`, and opens it in Chrome with Ozone/Wayland support.
 
-### Docker Compose
+### Podman Compose / Docker Compose
 
 The `compose.yaml` configures:
 
@@ -96,7 +113,7 @@ These are picked up automatically from your shell environment — no need to set
 |---|---|
 | GUI apps don't appear | Ensure `DISPLAY` or `WAYLAND_DISPLAY` is set on the host and the corresponding socket is mounted. |
 | Chrome crashes | Increase `shm_size` in `compose.yaml` (default is `2gb`). |
-| Permission errors on volumes | Check that `userns_mode: keep-id` is supported by your runtime, or adjust file ownership. |
+| Permission errors on volumes | This setup is optimized for Podman and uses `userns_mode: "keep-id"`. If using Docker, you may need to comment out or remove this line in `compose.yaml` to avoid validation errors, or adjust file ownership. |
 | OAuth flow not completing | Inspect `/tmp/auth-url.log` inside the container for intercepted URLs. |
 
 ## License
