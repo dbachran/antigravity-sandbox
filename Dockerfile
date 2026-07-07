@@ -4,6 +4,7 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Grundlegende Abhängigkeiten für Downloads und Chrome
+# Erweitert um LaTeX-Pakete (texlive, latexmk)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -12,6 +13,12 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     fish \
     git \
+    texlive-latex-recommended \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-lang-german \
+    latexmk \
     && rm -rf /var/lib/apt/lists/*
 
 # Google Chrome installieren
