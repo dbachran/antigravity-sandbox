@@ -33,7 +33,36 @@ podman compose up -d --build
 podman exec -it antigravity-sandbox bash
 ```
 
-## How to Update
+## Agentic AI Workspace Setup
+
+This project is optimized for collaboration with autonomous AI agents (like Google Antigravity or Claude Code). We use a hybrid infrastructure approach:
+The underlying container provides only the bare toolchain (Python, Node.js, sudo). **All project-specific dependencies are installed autonomously by the agent.**
+
+To ensure the agents know how to behave in this repository, the following rules of conduct should be stored in the agent configuration (e.g., `AGENTS.md` in the project root):
+
+### Template for `AGENTS.md`
+
+Copy the following instructions into your agent's configuration file to activate the autonomous workflow:
+
+> **System Permissions & Tooling**
+> * You operate in an unprivileged Podman container but have passwordless `sudo` privileges for system tools.
+> * If mandatory system packages (e.g., C libraries, `curl`, `jq`) are missing, use `sudo apt-get install -y <package>` to install them autonomously before aborting.
+> 
+> **Python Dependency Management**
+> * This is a Python project. Never modify global Python packages.
+> * Before executing code, starting tests, or importing modules, always check if the `.venv` directory exists.
+> * If `.venv` does not exist: Create it (`python3 -m venv .venv`), activate it, and install dependencies via `pip install -r requirements.txt`.
+> * If you need new external packages for a feature, install them in the virtual environment and immediately add them to `requirements.txt`.
+> 
+> **Testing & Validation (TDD)**
+> * Before marking a task as completed or preparing a Git commit, always run the test suite via `pytest`.
+> * If tests fail, analyze the traceback, correct the code, and run the tests again until they are green (Autonomous TDD loop).
+> 
+> **Architecture & Style**
+> * Prefer pure, side-effect-free functions. 
+> * Consistently use type hints for all function signatures.
+
+## How to Update the Container
 
 Check and copy download links from [Google Antigravity Download page for Linux](https://antigravity.google/download).
 
