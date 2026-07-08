@@ -3,8 +3,7 @@ FROM ubuntu:24.04
 # Vermeide interaktive Prompts während der apt-Installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Grundlegende Abhängigkeiten für Downloads und Chrome
-# Erweitert um LaTeX-Pakete (texlive, latexmk)
+# Grundlegende Abhängigkeiten für Downloads und Chrome (inkl. sudo um die Agenten nötige Tools selber nachinstallieren zu lassen)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -13,13 +12,12 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     fish \
     git \
-    texlive-latex-recommended \
-    texlive-latex-extra \
-    texlive-fonts-recommended \
-    texlive-fonts-extra \
-    texlive-lang-german \
-    latexmk \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
+
+# Dem Standard-Distrobox-User passwortloses sudo erlauben
+# (Distrobox legt den User dynamisch an, daher konfigurieren wir die sudoers-Gruppe)
+RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Google Chrome installieren
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
