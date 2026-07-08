@@ -1,4 +1,9 @@
+# Copyright (C) 2026 Daniel Bachran <daniel@bachran.de>
+# This file is part of Antigravity Sandbox and is licensed under the GPL-3.0 License.
+# See LICENSE file in the project root for full license information.
+
 FROM ubuntu:24.04
+
 
 # Vermeide interaktive Prompts während der apt-Installation
 ENV DEBIAN_FRONTEND=noninteractive

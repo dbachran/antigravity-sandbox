@@ -118,4 +118,11 @@ These are picked up automatically from your shell environment — no need to set
 
 ## License
 
-This project does not currently include a license. Please add one before distributing.
+Copyright (C) 2026 Daniel Bachran <daniel@bachran.de>
+
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
+## Credits
+
+* **Author:** Daniel Bachran <daniel@bachran.de>
+* **Development Partner:** Built with the assistance of Antigravity, an AI coding assistant developed by Google DeepMind.
