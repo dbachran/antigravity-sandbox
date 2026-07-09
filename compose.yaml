@@ -10,7 +10,8 @@ services:
     userns_mode: "keep-id"
     shm_size: "2gb"
     devices:
-      - "/dev/dri:/dev/dri"
+      - "/dev/dri:/dev/dri" # Required for GPU hardware acceleration
+      - "/dev/kvm:/dev/kvm" # Required for Android Studio emulator acceleration (KVM)
     environment:
       DISPLAY: ${DISPLAY}
       WAYLAND_DISPLAY: ${WAYLAND_DISPLAY}

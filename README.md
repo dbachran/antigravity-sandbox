@@ -1,10 +1,10 @@
 # Antigravity Sandbox
 
-A Podman-based sandbox environment (with Docker fallback) for running **Antigravity Hub** and **Antigravity IDE** inside a container with full GUI support (Wayland / X11).
+A Podman-based sandbox environment (with Docker fallback) for running **Antigravity 2.0** and **Antigravity IDE** inside a container with full GUI support (Wayland / X11), see [Google Antigravity](https://antigravity.google/).
 
 ## Overview
 
-This project packages Antigravity Hub and Antigravity IDE into an Ubuntu 24.04 container, forwarding the host's display server so that both applications can render their UIs natively. It also bundles Google Chrome for handling OAuth login flows via a custom `xdg-open` wrapper.
+This project packages Antigravity 2.0 and Antigravity IDE into an Ubuntu 24.04 container, forwarding the host's display server so that both applications can render their UIs natively. It also bundles Google Chrome for handling OAuth login flows via a custom `xdg-open` wrapper.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ This project packages Antigravity Hub and Antigravity IDE into an Ubuntu 24.04 c
 |---|---|
 | **Podman / Docker** | Podman with Podman Compose (preferred), or Docker with Compose v2 |
 | **Display server** | Wayland (preferred) or X11 |
-| **GPU access** | `/dev/dri` must be available on the host |
+| **GPU/KVM access** | `/dev/dri` (for GPU hardware acceleration) and `/dev/kvm` (for Android Studio / Android Emulator acceleration) must be available on the host |
 | **Host OS** | Linux (tested on Wayland-based desktops) |
 
 ## Quick Start
@@ -85,7 +85,7 @@ podman compose up -d --force-recreate
 .
 ├── .env.example     # Template — copy to .env and edit
 ├── .env             # Local config (git-ignored) with your paths
-├── Dockerfile       # Container image: Ubuntu 24.04 + Chrome + Antigravity Hub & IDE
+├── Dockerfile       # Container image: Ubuntu 24.04 + Chrome + Antigravity 2.0 & IDE
 ├── compose.yaml     # Compose service definition with display & volume mounts
 └── README.md
 ```
@@ -96,7 +96,7 @@ podman compose up -d --force-recreate
 
 1. **Base image** — Ubuntu 24.04 with essential tools (`wget`, `curl`, `git`, `fish`).
 2. **Google Chrome** — Installed from the official APT repository, used for OAuth redirects.
-3. **Antigravity Hub** — Downloaded and extracted to `/opt/antigravity-x86`.
+3. **Antigravity 2.0** — Downloaded and extracted to `/opt/antigravity-x86`.
 4. **Antigravity IDE** — Downloaded and extracted to `/opt/antigravity-ide`.
 5. **`xdg-open` wrapper** — A small script that intercepts URL-open calls, logs the URL to `/tmp/auth-url.log`, and opens it in Chrome with Ozone/Wayland support.
 
@@ -105,7 +105,8 @@ podman compose up -d --force-recreate
 The `compose.yaml` configures:
 
 - **Host networking** (`network_mode: host`) for seamless localhost access.
-- **GPU passthrough** via `/dev/dri`.
+- **GPU passthrough** via `/dev/dri` (for UI hardware acceleration).
+- **KVM passthrough** via `/dev/kvm` (for Android Studio / Android Emulator hardware acceleration).
 - **Display forwarding** by mounting the X11/Wayland sockets and setting `DISPLAY` / `WAYLAND_DISPLAY`.
 - **Shared volumes** for fonts and the Antigravity working directory.
 - **2 GB shared memory** (`shm_size`) for Chrome's rendering.
@@ -143,6 +144,7 @@ These are picked up automatically from your shell environment — no need to set
 | GUI apps don't appear | Ensure `DISPLAY` or `WAYLAND_DISPLAY` is set on the host and the corresponding socket is mounted. |
 | Chrome crashes | Increase `shm_size` in `compose.yaml` (default is `2gb`). |
 | Permission errors on volumes | This setup is optimized for Podman and uses `userns_mode: "keep-id"`. If using Docker, you may need to comment out or remove this line in `compose.yaml` to avoid validation errors, or adjust file ownership. |
+| Permission errors on `/dev/dri` or `/dev/kvm` | If you don't have access to these devices, or if they don't exist on the host, you can comment them out under `devices` in `compose.yaml`. |
 | OAuth flow not completing | Inspect `/tmp/auth-url.log` inside the container for intercepted URLs. |
 
 ## License
