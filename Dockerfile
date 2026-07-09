@@ -5,10 +5,10 @@
 FROM ubuntu:24.04
 
 
-# Vermeide interaktive Prompts während der apt-Installation
+# Avoid interactive prompts during apt installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Grundlegende Abhängigkeiten für Downloads und Chrome (inkl. sudo um die Agenten nötige Tools selber nachinstallieren zu lassen)
+# Basic dependencies for downloads and Chrome (incl. sudo to allow agents to install necessary tools themselves)
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -20,32 +20,32 @@ RUN apt-get update && apt-get install -y \
     sudo \
     && rm -rf /var/lib/apt/lists/*
 
-# Dem Standard-Distrobox-User passwortloses sudo erlauben
-# (Distrobox legt den User dynamisch an, daher konfigurieren wir die sudoers-Gruppe)
-RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+# Allow default user to run sudo without password
+RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/99_ubuntu_nopasswd && \
+    chmod 0440 /etc/sudoers.d/99_ubuntu_nopasswd
 
-# Google Chrome installieren
+# Install Google Chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Verzeichnisse für Antigravity vorbereiten
+# Create directories for Antigravity
 RUN mkdir -p /opt/antigravity-x86 /opt/antigravity-ide
 
-# Antigravity 2.0 herunterladen und entpacken
-# Hinweis: Passe den tar-Befehl an, falls die Datei ein anderes Format hat (z.B. .deb oder .zip)
+# Download Antigravity 2.0 and extract
+# Note: Adjust the tar command if the file has a different format (e.g. .deb or .zip)
 RUN curl -L -o /tmp/ag2.tar.gz https://storage.googleapis.com/antigravity-public/antigravity-hub/2.2.1-5287492581195776/linux-x64/Antigravity.tar.gz \
     && tar -xzf /tmp/ag2.tar.gz -C /opt/antigravity-x86 --strip-components=1 \
     && rm /tmp/ag2.tar.gz
 
-# Antigravity IDE herunterladen und entpacken
+# Download Antigravity IDE and extract
 RUN curl -L -o /tmp/ag-ide.tar.gz https://edgedl.me.gvt1.com/edgedl/release2/j0qc3/antigravity/stable/2.1.1-6123990880747520/linux-x64/Antigravity%20IDE.tar.gz \
     && tar -xzf /tmp/ag-ide.tar.gz -C /opt/antigravity-ide --strip-components=1 \
     && rm /tmp/ag-ide.tar.gz
 
-# xdg-open Wrapper für Wayland/Chrome erstellen, um OAuth-Logins abzufangen
+# xdg-open Wrapper for Wayland/Chrome to intercept OAuth logins
 RUN printf '#!/bin/bash\n\
 echo "$1" >> /tmp/auth-url.log\n\
 if [ -n "$WAYLAND_DISPLAY" ]; then\n\
@@ -55,5 +55,5 @@ else\n\
 fi\n' > /usr/local/bin/xdg-open \
     && chmod +x /usr/local/bin/xdg-open
 
-# Standard-Kommando
+# Keep the container running indefinitely to be able to run the GUI tools on demand
 CMD ["sleep", "infinity"]
